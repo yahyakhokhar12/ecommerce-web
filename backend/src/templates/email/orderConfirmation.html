@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head><meta charset="UTF-8"></head>
+<body style="font-family: Arial; background:#f5f5f5; padding:20px;">
+  <div style="max-width:600px; margin:0 auto; background:#fff; padding:30px; border-radius:8px;">
+    <h1 style="color:#667eea;">Order Confirmed ✅</h1>
+    <p>Hi {{name}},</p>
+    <p>Thank you for your order! Your order number is <strong>{{orderNumber}}</strong>.</p>
+    <table style="width:100%; border-collapse:collapse; margin:20px 0;">
+      <thead><tr style="background:#f5f5f5;"><th>Item</th><th>Qty</th><th>Price</th><th>Total</th></tr></thead>
+      <tbody>{{items}}</tbody>
+    </table>
+    <h3>Total: ${{total}}</h3>
+    <p>We'll send you a tracking number once your order ships.</p>
+  </div>
+</body>
+</html>
