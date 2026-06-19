@@ -20,6 +20,14 @@ import { AdminDashboard } from '../pages/admin/Dashboard.jsx';
 import { Analytics } from '../pages/admin/Analytics.jsx';
 import { AdminProducts } from '../pages/admin/Products.jsx';
 import { AdminOrders } from '../pages/admin/Orders.jsx';
+import AdminUsers from '../pages/admin/Users.jsx';
+import AdminCategories from '../pages/admin/Categories.jsx';
+import AdminCoupons from '../pages/admin/Coupons.jsx';
+import AdminReviews from '../pages/admin/Reviews.jsx';
+import AdminPayments from '../pages/admin/Payments.jsx';
+import AdminInventory from '../pages/admin/Inventory.jsx';
+import AdminSettings from '../pages/admin/Settings.jsx';
+import AdminReports from '../pages/admin/Reports.jsx';
 import { ProtectedRoute } from './ProtectedRoute.jsx';
 import { AdminRoute } from './AdminRoute.jsx';
 import { Header } from '../components/layout/Header.jsx';
@@ -54,6 +62,14 @@ export const AppRoutes = () => (
           <Route path="analytics" element={<Analytics />} />
           <Route path="products" element={<AdminProducts />} />
           <Route path="orders" element={<AdminOrders />} />
+          <Route path="users" element={<AdminUsers />} />
+          <Route path="categories" element={<AdminCategories />} />
+          <Route path="coupons" element={<AdminCoupons />} />
+          <Route path="reviews" element={<AdminReviews />} />
+          <Route path="payments" element={<AdminPayments />} />
+          <Route path="inventory" element={<AdminInventory />} />
+          <Route path="settings" element={<AdminSettings />} />
+          <Route path="reports" element={<AdminReports />} />
         </Route>
 
         <Route path="*" element={<NotFound />} />
