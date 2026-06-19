@@ -1,0 +1,8 @@
+<svg width="220" height="80" viewBox="0 0 220 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect x="6" y="12" width="56" height="56" rx="16" fill="#7C5CFF"/>
+  <path d="M22 30C22 26.6863 24.6863 24 28 24H44C47.3137 24 50 26.6863 50 30V46C50 49.3137 47.3137 52 44 52H28C24.6863 52 22 49.3137 22 46V30Z" fill="#0B0F1A"/>
+  <path d="M26 34H46V38H26V34Z" fill="#7C5CFF"/>
+  <path d="M26 42H46V46H26V42Z" fill="#7C5CFF"/>
+  <circle cx="76" cy="40" r="10" fill="#22D3EE" opacity="0.8"/>
+  <text x="96" y="46" font-family="Space Grotesk, Arial, sans-serif" font-size="28" fill="#F3F5FF" font-weight="700">MyShop</text>
+</svg>
