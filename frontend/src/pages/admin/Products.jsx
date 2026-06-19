@@ -512,24 +512,3 @@ export const AdminProducts = () => {
 };
 
 export default AdminProducts;
-                    <div>
-                      <p className="font-medium">{p.title}</p>
-                      <p className="text-xs text-muted-foreground">{p.brand}</p>
-                    </div>
-                  </td>
-                  <td className="p-4 font-medium">{formatPrice(p.finalPrice)}</td>
-                  <td className="p-4">{p.stock}</td>
-                  <td className="p-4"><Badge variant={p.isActive ? 'success' : 'secondary'}>{p.isActive ? 'Active' : 'Inactive'}</Badge></td>
-                  <td className="p-4 text-right">
-                    <Button variant="ghost" size="icon"><Pencil className="h-4 w-4" /></Button>
-                    <Button variant="ghost" size="icon" onClick={() => handleDelete(p._id)}><Trash2 className="h-4 w-4 text-destructive" /></Button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </Card>
-    </div>
-  );
-};
