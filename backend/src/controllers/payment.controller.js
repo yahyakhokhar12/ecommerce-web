@@ -4,6 +4,7 @@ import { sendSuccess } from '../utils/apiResponse.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
 import { config } from '../config/index.js';
 import { ApiError } from '../utils/apiError.js';
+import { logger } from '../utils/logger.js';
 
 export const createPaymentIntent = asyncHandler(async (req, res) => {
   const { amount, orderId } = req.body;
@@ -41,7 +42,9 @@ export const stripeWebhook = asyncHandler(async (req, res) => {
       try {
         const { sendOrderConfirmation } = await import('../services/email.service.js');
         await sendOrderConfirmation(order.user, order);
-      } catch {}
+      } catch (error) {
+        logger.warn(`Payment confirmation email failed for ${order._id}: ${error.message}`);
+      }
     }
   }
 

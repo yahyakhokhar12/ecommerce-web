@@ -3,6 +3,10 @@ import { config } from '../config/index.js';
 import { logger } from './logger.js';
 
 export const sendEmail = async ({ to, subject, html, attachments = [] }) => {
+  if (config.env === 'test') {
+    return { messageId: 'test-email-skipped', to, subject };
+  }
+
   try {
     const mailOptions = {
       from: `"${config.smtp.fromName}" <${config.smtp.fromEmail}>`,

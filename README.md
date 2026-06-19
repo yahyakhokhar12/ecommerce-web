@@ -1,111 +1,163 @@
-# 🛍️ LuxeCart — Premium MERN E-Commerce Platform
+# Ecommerce Web
 
-A production-ready, full-stack e-commerce application built with React, Node.js, Express, MongoDB, and Stripe.
+Production-ready MERN e-commerce application with React, Vite, Redux Toolkit, Express, MongoDB, Stripe, Cloudinary, email templates, admin analytics, wishlist, reviews, coupons, Docker, linting, and tests.
 
-![Banner](https://via.placeholder.com/1200x400/8b5cf6/ffffff?text=LuxeCart+Premium+E-Commerce)
+## Folder Structure
 
-## ✨ Features
+```text
+ecommerce-web/
+  backend/
+    src/
+      config/          database, providers, environment config
+      controllers/     API request handlers
+      docs/            Swagger setup
+      jobs/            scheduled jobs
+      middlewares/     auth, upload, validation, error handling
+      models/          Mongoose models
+      routes/          Express routers
+      services/        analytics and email services
+      templates/       HTML email templates
+      tests/           backend API tests
+      utils/           shared API, logging, token helpers
+  frontend/
+    src/
+      api/             RTK Query API slices
+      app/             Redux store
+      components/      layout, common, forms, UI primitives
+      features/        Redux slices
+      hooks/           reusable hooks
+      pages/           public, user, and admin pages
+      routes/          app route guards and route map
+  docker-compose.yml
+  package.json
+```
 
-- 🛒 Complete shopping experience (browse, cart, checkout, orders)
-- 🔐 JWT authentication with refresh tokens & RBAC
-- 💳 Stripe payment integration with webhooks
-- 📧 Beautiful HTML email templates
-- 📊 Admin analytics dashboard with Recharts
-- 🎨 Premium UI with glassmorphism, gradients & animations
-- 🌗 Dark/Light mode with persistence
-- 📱 Fully responsive (320px to 4K)
-- ☁️ Cloudinary image uploads
-- 🎟️ Coupon system
-- ❤️ Wishlist
-- ⭐ Product reviews
-- 🐳 Docker & Docker Compose ready
+## Requirements
 
-## 🛠️ Tech Stack
+- Node.js 22+ and npm 10+
+- MongoDB 7+ for local backend runtime, or MongoDB Atlas
+- Stripe keys for payments
+- Cloudinary credentials for product images
+- SMTP credentials for transactional email
 
-**Frontend:** React 19, Vite, Redux Toolkit, RTK Query, Tailwind, Shadcn UI, Framer Motion, Recharts
-**Backend:** Node.js, Express, MongoDB, Mongoose, JWT, Stripe, Cloudinary, Nodemailer
-**DevOps:** Docker, Docker Compose, Nginx, Winston Logger, Jest
+## Environment
 
-## 🚀 Quick Start
+Copy `backend/.env.example` to `backend/.env` for local backend development.
 
-### Prerequisites
-- Node.js 18+
-- MongoDB (local or Atlas)
-- Stripe account
-- Cloudinary account
-- SMTP email (Gmail/SendGrid)
+Copy `frontend/.env.example` to `frontend/.env` for local frontend development.
 
-### Installation
+Copy root `.env.example` to `.env` before `docker compose up --build`.
+
+Important variables:
+
+- `MONGO_URI`: MongoDB connection string used by the backend.
+- `JWT_ACCESS_SECRET`, `JWT_REFRESH_SECRET`: long random JWT secrets.
+- `CLIENT_URL`: browser origin allowed by CORS.
+- `VITE_API_URL`: frontend API base URL, usually `http://localhost:5000/api/v1`.
+- `VITE_STRIPE_PUBLISHABLE_KEY`: Stripe browser key.
+- `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`: backend Stripe credentials.
+- `CLOUDINARY_*`: image upload credentials.
+- `SMTP_*`, `FROM_EMAIL`, `FROM_NAME`: outbound email configuration.
+
+## Local Setup
 
 ```bash
-# Clone
-git clone <repo>
-cd ecommerce-mern
+npm run install:all
 
-# Backend
 cd backend
-cp .env.example .env  # fill in values
-npm install
+copy .env.example .env
 npm run dev
 
-# Frontend (new terminal)
+cd ..\frontend
+copy .env.example .env
+npm run dev
+```
+
+Open `http://localhost:5173`. API health is available at `http://localhost:5000/health`; Swagger docs are available at `http://localhost:5000/api-docs`.
+
+## Database Setup
+
+Local MongoDB:
+
+```bash
+docker run --name ecommerce-mongo -p 27017:27017 -d mongo:7
+```
+
+Use this in `backend/.env`:
+
+```text
+MONGO_URI=mongodb://localhost:27017/ecommerce
+```
+
+Tests use `mongodb-memory-server`, so they do not require a local MongoDB instance.
+
+## Standard Commands
+
+```bash
+npm run build
+npm run lint
+npm test
+npm run audit
+```
+
+Backend-only:
+
+```bash
+cd backend
+npm start
+npm run dev
+npm test
+```
+
+Frontend-only:
+
+```bash
 cd frontend
-cp .env.example .env  # fill in values
-npm install
 npm run dev
+npm run build
+npm run preview
 ```
 
-Visit http://localhost:5173
-
-### Docker
+## Docker
 
 ```bash
-docker-compose up --build
+copy .env.example .env
+docker compose up --build
 ```
 
-Visit http://localhost
+Frontend: `http://localhost`
 
-## 📦 Deployment
+Backend: `http://localhost:5000`
 
-### Backend → Render
-1. Push to GitHub
-2. New → Web Service → Connect repo → Root: `backend`
-3. Build: `npm install` | Start: `npm start`
-4. Add all env vars
-5. Deploy
+MongoDB runs as the `mongo` service and persists data in the `mongo_data` volume.
 
-### Frontend → Vercel
-1. New Project → Import repo → Root: `frontend`
-2. Framework: Vite
-3. Add `VITE_API_URL` env var
-4. Deploy
+## Deployment
 
-## 📁 Project Structure
+Backend:
 
-```
-ecommerce-mern/
-├── backend/         # Express API
-├── frontend/        # React app
-└── docker-compose.yml
-```
+1. Deploy `backend/` as a Node service.
+2. Build with `npm ci --omit=dev`.
+3. Start with `npm start`.
+4. Set all backend environment variables from `backend/.env.example`.
+5. Configure Stripe webhooks to call `/api/v1/payment/webhook`.
 
-## 🔑 API Endpoints
+Frontend:
 
-- `POST /api/v1/auth/register` - Register user
-- `POST /api/v1/auth/login` - Login
-- `GET  /api/v1/products` - List products (filter, sort, paginate)
-- `POST /api/v1/orders` - Create order
-- `POST /api/v1/payment/create-intent` - Stripe payment
-- `GET  /api/v1/admin/dashboard` - Admin stats
-- ... see `/api-docs` for full Swagger docs
+1. Deploy `frontend/` as a Vite static app.
+2. Build with `npm ci && npm run build`.
+3. Publish `frontend/dist`.
+4. Set `VITE_API_URL` and `VITE_STRIPE_PUBLISHABLE_KEY` at build time.
 
-## 🧪 Testing
+## API
 
-```bash
-cd backend && npm test
-cd frontend && npm test
-```
+- `GET /health`
+- `POST /api/v1/auth/register`
+- `POST /api/v1/auth/login`
+- `POST /api/v1/auth/refresh-token`
+- `GET /api/v1/products`
+- `GET /api/v1/categories`
+- `POST /api/v1/orders`
+- `POST /api/v1/payment/create-intent`
+- `GET /api/v1/admin/dashboard`
 
-## 📄 License
-
-MIT
+See `/api-docs` for the full Swagger UI.

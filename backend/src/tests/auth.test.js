@@ -1,15 +1,30 @@
 import request from 'supertest';
-import app from '../app.js';
-import User from '../models/User.js';
+import { after, before, describe, it } from 'node:test';
+import assert from 'node:assert/strict';
 import mongoose from 'mongoose';
+import { MongoMemoryServer } from 'mongodb-memory-server';
 
-beforeAll(async () => {
-  await mongoose.connect(process.env.MONGO_URI_TEST || 'mongodb://localhost:27017/ecommerce-test');
+process.env.NODE_ENV = 'test';
+process.env.JWT_ACCESS_SECRET = process.env.JWT_ACCESS_SECRET || 'test-access-secret-change-me';
+process.env.JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET || 'test-refresh-secret-change-me';
+process.env.JWT_ACCESS_EXPIRE = process.env.JWT_ACCESS_EXPIRE || '15m';
+process.env.JWT_REFRESH_EXPIRE = process.env.JWT_REFRESH_EXPIRE || '7d';
+process.env.CLIENT_URL = process.env.CLIENT_URL || 'http://localhost:5173';
+
+const { default: app } = await import('../app.js');
+let mongoServer;
+
+before(async () => {
+  mongoServer = await MongoMemoryServer.create();
+  await mongoose.connect(mongoServer.getUri());
 });
 
-afterAll(async () => {
-  await mongoose.connection.dropDatabase();
-  await mongoose.connection.close();
+after(async () => {
+  if (mongoose.connection.readyState) {
+    await mongoose.connection.dropDatabase();
+    await mongoose.connection.close();
+  }
+  await mongoServer?.stop();
 });
 
 describe('Auth API', () => {
@@ -17,7 +32,7 @@ describe('Auth API', () => {
     const res = await request(app)
       .post('/api/v1/auth/register')
       .send({ name: 'Test', email: 'test@test.com', password: 'Password123!' });
-    expect(res.status).toBe(201);
-    expect(res.body.success).toBe(true);
+    assert.equal(res.status, 201);
+    assert.equal(res.body.success, true);
   });
 });

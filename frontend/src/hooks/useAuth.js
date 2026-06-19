@@ -35,7 +35,11 @@ export const useAuth = () => {
   };
 
   const signOut = async () => {
-    try { await logout().unwrap(); } catch {}
+    try {
+      await logout().unwrap();
+    } catch (_error) {
+      // Local logout should still complete if the token is already expired.
+    }
     dispatch(logoutAction());
     toast.success('Logged out');
     navigate('/');

@@ -11,6 +11,7 @@ import {
 } from '../utils/token.js';
 import { sendWelcomeEmail, sendPasswordResetEmail } from '../services/email.service.js';
 import { config } from '../config/index.js';
+import { logger } from '../utils/logger.js';
 
 export const register = asyncHandler(async (req, res) => {
   const { name, email, password } = req.body;
@@ -25,7 +26,11 @@ export const register = asyncHandler(async (req, res) => {
   await user.save({ validateBeforeSave: false });
 
   setTokenCookies(res, accessToken, refreshToken);
-  try { await sendWelcomeEmail(user); } catch {}
+  try {
+    await sendWelcomeEmail(user);
+  } catch (error) {
+    logger.warn(`Welcome email failed for ${user.email}: ${error.message}`);
+  }
 
   sendSuccess(res, 201, {
     user: { id: user._id, name: user.name, email: user.email, role: user.role },

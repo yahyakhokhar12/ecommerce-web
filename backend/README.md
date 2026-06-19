@@ -1,16 +1,27 @@
 # Backend API
 
-## Environment Variables
+Express and MongoDB API for the e-commerce application.
 
-See `.env.example` for all required variables.
+## Setup
+
+```bash
+npm install
+copy .env.example .env
+npm run dev
+```
+
+Set `MONGO_URI`, JWT secrets, `CLIENT_URL`, Stripe, Cloudinary, and SMTP values in `.env`.
 
 ## Scripts
 
-- `npm run dev` - Development with nodemon
-- `npm start` - Production
-- `npm test` - Run tests
-- `npm run seed` - Seed database
+- `npm start`: start production server.
+- `npm run dev`: start with nodemon.
+- `npm run lint`: run ESLint.
+- `npm test`: run API tests with Node's built-in test runner and in-memory MongoDB.
+- `npm run seed`: run the database seeder if present.
 
-## API Documentation
+## Runtime
 
-Visit `/api-docs` after starting the server for interactive Swagger UI.
+- Health check: `GET /health`
+- API base: `/api/v1`
+- Swagger UI: `/api-docs`

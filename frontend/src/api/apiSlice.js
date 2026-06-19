@@ -49,3 +49,14 @@ export const apiSlice = createApi({
     getAnalytics: builder.query({ query: (days) => ({ url: '/admin/analytics', params: { days } }) }),
   }),
 });
+
+export const {
+  useGetProductsQuery,
+  useGetProductQuery,
+  useGetCategoriesQuery,
+  useGetMyOrdersQuery,
+  useGetOrderQuery,
+  useGetWishlistQuery,
+  useGetDashboardQuery,
+  useGetAnalyticsQuery,
+} = apiSlice;

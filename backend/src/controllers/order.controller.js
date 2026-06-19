@@ -6,6 +6,7 @@ import { sendSuccess } from '../utils/apiResponse.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
 import { ApiFeatures } from '../utils/apiFeatures.js';
 import { sendOrderConfirmation, sendOrderShippedEmail, sendOrderDeliveredEmail } from '../services/email.service.js';
+import { logger } from '../utils/logger.js';
 
 const TAX_RATE = 0.08;
 const FREE_SHIPPING_THRESHOLD = 100;
@@ -73,7 +74,11 @@ export const createOrder = asyncHandler(async (req, res) => {
     await Product.findByIdAndUpdate(item.product, { $inc: { stock: -item.quantity, sold: item.quantity } });
   }
 
-  try { await sendOrderConfirmation(req.user, order); } catch {}
+  try {
+    await sendOrderConfirmation(req.user, order);
+  } catch (error) {
+    logger.warn(`Order confirmation email failed for ${order._id}: ${error.message}`);
+  }
 
   sendSuccess(res, 201, order, 'Order created');
 });
@@ -115,10 +120,18 @@ export const updateOrderStatus = asyncHandler(async (req, res) => {
   if (status === 'delivered') {
     order.deliveredAt = new Date();
     order.paymentInfo.status = 'paid';
-    try { await sendOrderDeliveredEmail(order.user, order); } catch {}
+    try {
+      await sendOrderDeliveredEmail(order.user, order);
+    } catch (error) {
+      logger.warn(`Order delivered email failed for ${order._id}: ${error.message}`);
+    }
   }
   if (status === 'shipped') {
-    try { await sendOrderShippedEmail(order.user, order); } catch {}
+    try {
+      await sendOrderShippedEmail(order.user, order);
+    } catch (error) {
+      logger.warn(`Order shipped email failed for ${order._id}: ${error.message}`);
+    }
   }
   await order.save();
   sendSuccess(res, 200, order, 'Order updated');
