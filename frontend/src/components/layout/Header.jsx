@@ -29,21 +29,25 @@ export const Header = () => {
 
   const handleSearch = (e) => {
     e.preventDefault();
-    if (search.trim()) navigate(`/products?search=${search}`);
+    const value = search.trim();
+    if (value) {
+      navigate(`/products?search=${encodeURIComponent(value)}`);
+      setOpen(false);
+    }
   };
 
   return (
-    <header className="sticky top-0 z-50 w-full glass border-b">
-      <div className="container flex h-16 items-center justify-between gap-4">
+    <header className="sticky top-0 z-50 w-full border-b border-white/10 bg-[#080d18]/80 backdrop-blur-2xl">
+      <div className="container flex h-20 items-center justify-between gap-4">
         <Logo />
-        <nav className="hidden md:flex items-center gap-6">
+        <nav className="hidden md:flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.05] p-1">
           {links.map((l) => (
             <NavLink
               key={l.to}
               to={l.to}
               end={l.to === '/'}
               className={({ isActive }) =>
-                `text-sm font-medium transition-colors hover:text-primary ${isActive ? 'text-primary' : 'text-foreground/70'}`
+                `rounded-full px-4 py-2 text-sm font-medium transition ${isActive ? 'bg-white text-slate-950 shadow-lg shadow-black/20' : 'text-slate-300 hover:bg-white/10 hover:text-white'}`
               }
             >
               {l.label}
@@ -52,18 +56,18 @@ export const Header = () => {
         </nav>
 
         <form onSubmit={handleSearch} className="hidden lg:flex relative flex-1 max-w-md">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" />
           <input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search products..."
-            className="w-full h-10 pl-10 pr-4 rounded-full border bg-background/50 focus:outline-none focus:ring-2 focus:ring-ring"
+            className="h-11 w-full rounded-full border border-white/10 bg-white/[0.06] pl-11 pr-4 text-sm text-white placeholder:text-slate-500 shadow-inner shadow-black/20 outline-none transition focus:border-teal-300/60 focus:ring-2 focus:ring-teal-300/20"
           />
         </form>
 
         <div className="flex items-center gap-1">
           <ThemeToggle />
-          <Link to="/wishlist" className="relative p-2">
+          <Link to="/wishlist" className="relative rounded-full p-2 text-slate-300 transition hover:bg-white/10 hover:text-white">
             <Heart className="h-5 w-5" />
             {wishlistCount > 0 && (
               <Badge variant="destructive" className="absolute -top-1 -right-1 h-5 w-5 p-0 flex items-center justify-center text-[10px]">
@@ -71,7 +75,7 @@ export const Header = () => {
               </Badge>
             )}
           </Link>
-          <Link to="/cart" className="relative p-2">
+          <Link to="/cart" className="relative rounded-full p-2 text-slate-300 transition hover:bg-white/10 hover:text-white">
             <ShoppingCart className="h-5 w-5" />
             {cartCount > 0 && (
               <Badge variant="destructive" className="absolute -top-1 -right-1 h-5 w-5 p-0 flex items-center justify-center text-[10px]">
@@ -81,7 +85,7 @@ export const Header = () => {
           </Link>
           {isAuthenticated ? (
             <div className="relative">
-              <button onClick={() => setMenuOpen(!menuOpen)} className="p-2">
+              <button onClick={() => setMenuOpen(!menuOpen)} className="p-2" aria-label="Open account menu">
                 <div className="h-8 w-8 rounded-full gradient-bg flex items-center justify-center text-white font-medium text-sm">
                   {user.name?.[0]?.toUpperCase()}
                 </div>
@@ -118,7 +122,7 @@ export const Header = () => {
               </AnimatePresence>
             </div>
           ) : (
-            <Button asChild size="sm" variant="gradient" className="hidden sm:inline-flex">
+            <Button asChild size="sm" className="hidden bg-white text-slate-950 shadow-lg shadow-black/20 hover:bg-slate-100 sm:inline-flex">
               <Link to="/login">Sign In</Link>
             </Button>
           )}

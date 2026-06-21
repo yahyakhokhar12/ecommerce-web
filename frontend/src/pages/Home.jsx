@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowRight, Truck, Shield, RefreshCw, Headphones, Sparkles } from 'lucide-react';
+import { ArrowRight, Headphones, RefreshCw, Shield, Sparkles, Star, Truck } from 'lucide-react';
 import { useGetProductsQuery } from '../api/apiSlice.js';
 import { Button } from '../components/ui/button.jsx';
 import { ProductCard } from '../components/common/ProductCard.jsx';
@@ -11,101 +11,102 @@ export const Home = () => {
   const products = data?.data?.products || [];
 
   return (
-    <div>
-      {/* Hero */}
-      <section className="relative overflow-hidden">
-        <div className="absolute inset-0 -z-10">
-          <div className="absolute -top-40 -right-40 w-96 h-96 bg-fuchsia-500/20 rounded-full blur-3xl" />
-          <div className="absolute -bottom-40 -left-40 w-96 h-96 bg-violet-500/20 rounded-full blur-3xl" />
-        </div>
-        <div className="container py-20 lg:py-32 grid lg:grid-cols-2 gap-12 items-center">
+    <div className="overflow-hidden">
+      <section className="relative min-h-[calc(100vh-5rem)]">
+        <img
+          src="https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=1800&auto=format&fit=crop&q=85"
+          alt="Premium fashion products"
+          className="absolute inset-0 h-full w-full object-cover"
+        />
+        <div className="absolute inset-0 bg-gradient-to-r from-[#050812] via-[#07101d]/88 to-[#07101d]/35" />
+        <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-background to-transparent" />
+        <div className="container relative flex min-h-[calc(100vh-5rem)] items-center py-16">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="space-y-6"
+            transition={{ duration: 0.7 }}
+            className="max-w-3xl"
           >
-            <div className="inline-flex items-center gap-2 glass px-4 py-1.5 rounded-full text-sm">
-              <Sparkles className="h-3.5 w-3.5 text-fuchsia-500" />
-              <span>New Collection 2025</span>
+            <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.08] px-4 py-2 text-sm text-slate-200 backdrop-blur">
+              <Sparkles className="h-4 w-4 text-teal-300" />
+              New collection live now
             </div>
-            <h1 className="text-5xl lg:text-7xl font-bold leading-tight">
-              Discover <span className="gradient-text">Premium</span> Products
+            <h1 className="max-w-4xl text-6xl font-black leading-[0.95] tracking-tight text-white md:text-7xl lg:text-8xl">
+              Designed for people who buy with taste.
             </h1>
-            <p className="text-lg text-muted-foreground max-w-md">
-              Curated collection of the finest products, designed for the modern lifestyle.
+            <p className="mt-7 max-w-2xl text-lg leading-8 text-slate-300">
+              Discover elevated essentials, standout accessories, and premium products curated for a sharper everyday life.
             </p>
-            <div className="flex flex-wrap gap-3">
-              <Button asChild variant="gradient" size="lg">
-                <Link to="/products">Shop Now <ArrowRight className="h-4 w-4" /></Link>
+            <div className="mt-9 flex flex-wrap gap-3">
+              <Button asChild size="lg" className="bg-white text-slate-950 shadow-2xl shadow-black/30 hover:bg-slate-100">
+                <Link to="/products">
+                  Shop Collection
+                  <ArrowRight className="h-4 w-4" />
+                </Link>
               </Button>
-              <Button asChild size="lg" variant="outline">
-                <Link to="/about">Learn More</Link>
+              <Button asChild size="lg" variant="outline" className="border-white/15 bg-white/[0.06] text-white hover:bg-white/10">
+                <Link to="/products?discount[gt]=0">Explore Sale</Link>
               </Button>
             </div>
-            <div className="flex gap-8 pt-6">
+            <div className="mt-12 grid max-w-xl grid-cols-3 gap-3">
               {[
-                { v: '10k+', l: 'Products' },
-                { v: '50k+', l: 'Customers' },
-                { v: '4.9★', l: 'Rating' },
-              ].map((s) => (
-                <div key={s.l}>
-                  <p className="text-2xl font-bold gradient-text">{s.v}</p>
-                  <p className="text-xs text-muted-foreground">{s.l}</p>
+                { v: '10k+', l: 'Curated products' },
+                { v: '50k+', l: 'Happy customers' },
+                { v: '4.9', l: 'Average rating' },
+              ].map((item) => (
+                <div key={item.l} className="rounded-2xl border border-white/10 bg-black/25 p-4 backdrop-blur">
+                  <p className="text-3xl font-black text-white">{item.v}</p>
+                  <p className="mt-1 text-xs text-slate-400">{item.l}</p>
                 </div>
               ))}
             </div>
           </motion.div>
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            className="relative aspect-square"
-          >
-            <div className="absolute inset-0 gradient-bg rounded-3xl rotate-6 opacity-20" />
-            <div className="absolute inset-0 glass rounded-3xl overflow-hidden">
-              <img
-                src="https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?w=800"
-                alt="Hero"
-                className="w-full h-full object-cover"
-              />
-            </div>
-          </motion.div>
         </div>
       </section>
 
-      {/* Features */}
-      <section className="container py-12">
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <section className="section-shell">
+        <div className="container grid grid-cols-2 gap-4 py-10 lg:grid-cols-4">
           {[
             { icon: Truck, t: 'Free Shipping', d: 'On orders over $100' },
-            { icon: Shield, t: 'Secure Payment', d: '100% protected' },
-            { icon: RefreshCw, t: 'Easy Returns', d: '30-day return' },
-            { icon: Headphones, t: '24/7 Support', d: 'Dedicated help' },
-          ].map((f) => (
-            <div key={f.t} className="glass p-5 rounded-2xl">
-              <f.icon className="h-6 w-6 text-fuchsia-500 mb-2" />
-              <h3 className="font-semibold">{f.t}</h3>
-              <p className="text-sm text-muted-foreground">{f.d}</p>
-            </div>
+            { icon: Shield, t: 'Secure Payment', d: 'Encrypted checkout' },
+            { icon: RefreshCw, t: 'Easy Returns', d: '30-day return window' },
+            { icon: Headphones, t: 'Priority Support', d: 'Always-on help' },
+          ].map(({ icon: Icon, t, d }) => (
+            <motion.div
+              key={t}
+              whileHover={{ y: -4 }}
+              className="premium-panel rounded-2xl p-5"
+            >
+              <div className="mb-4 inline-flex h-11 w-11 items-center justify-center rounded-xl bg-white/[0.08]">
+                <Icon className="h-5 w-5 text-teal-300" />
+              </div>
+              <h3 className="font-semibold text-white">{t}</h3>
+              <p className="mt-1 text-sm text-slate-400">{d}</p>
+            </motion.div>
           ))}
         </div>
       </section>
 
-      {/* Featured Products */}
-      <section className="container py-16">
-        <div className="flex items-end justify-between mb-8">
+      <section className="container py-20">
+        <div className="mb-10 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
           <div>
-            <h2 className="text-3xl lg:text-4xl font-bold">Featured Products</h2>
-            <p className="text-muted-foreground mt-1">Hand-picked favorites</p>
+            <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.06] px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
+              <Star className="h-3.5 w-3.5 text-fuchsia-300" />
+              Editor picks
+            </div>
+            <h2 className="text-4xl font-black tracking-tight text-white lg:text-5xl">Featured Products</h2>
+            <p className="mt-2 text-slate-400">Hand-picked pieces with premium materials, sharp design, and everyday utility.</p>
           </div>
-          <Button asChild variant="ghost">
-            <Link to="/products">View all <ArrowRight className="h-4 w-4" /></Link>
+          <Button asChild variant="outline" className="border-white/10 bg-white/[0.05] text-white hover:bg-white/10">
+            <Link to="/products">
+              View all
+              <ArrowRight className="h-4 w-4" />
+            </Link>
           </Button>
         </div>
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {isLoading
-            ? Array.from({ length: 8 }).map((_, i) => <Skeleton key={i} className="aspect-square" />)
+            ? Array.from({ length: 8 }).map((_, i) => <Skeleton key={i} className="aspect-[4/5] rounded-3xl bg-white/10" />)
             : products.map((p) => <ProductCard key={p._id} product={p} />)}
         </div>
       </section>

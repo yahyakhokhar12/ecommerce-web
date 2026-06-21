@@ -1,4 +1,5 @@
 import Product from '../models/Product.js';
+import Category from '../models/Category.js';
 import { ApiError } from '../utils/apiError.js';
 import { sendSuccess } from '../utils/apiResponse.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
@@ -6,6 +7,9 @@ import { ApiFeatures } from '../utils/apiFeatures.js';
 import { uploadToCloudinary, deleteFromCloudinary } from '../middlewares/upload.middleware.js';
 
 export const getProducts = asyncHandler(async (req, res) => {
+  const countFeatures = new ApiFeatures(Product.find({ isActive: true }), req.query)
+    .filter()
+    .search(['title', 'description', 'brand', 'tags']);
   const features = new ApiFeatures(Product.find({ isActive: true }), req.query)
     .filter()
     .search(['title', 'description', 'brand', 'tags'])
@@ -15,7 +19,7 @@ export const getProducts = asyncHandler(async (req, res) => {
 
   const [products, total] = await Promise.all([
     features.query.populate('category', 'name slug'),
-    Product.countDocuments({ isActive: true }),
+    countFeatures.query.clone().countDocuments(),
   ]);
 
   const page = features.pagination.page;
@@ -38,17 +42,29 @@ export const getProduct = asyncHandler(async (req, res) => {
 });
 
 export const createProduct = asyncHandler(async (req, res) => {
+  const category = await Category.findById(req.body.category);
+  if (!category) throw new ApiError(400, 'Selected category does not exist');
+
   let images = [];
   if (req.files && req.files.length) {
     images = await Promise.all(req.files.map((f) => uploadToCloudinary(f, 'ecommerce/products')));
   }
-  const product = await Product.create({ ...req.body, images });
+  const product = await Product.create({
+    ...req.body,
+    sku: req.body.sku || undefined,
+    images,
+  });
   sendSuccess(res, 201, product, 'Product created');
 });
 
 export const updateProduct = asyncHandler(async (req, res) => {
   const product = await Product.findById(req.params.id);
   if (!product) throw new ApiError(404, 'Product not found');
+
+  if (req.body.category) {
+    const category = await Category.findById(req.body.category);
+    if (!category) throw new ApiError(400, 'Selected category does not exist');
+  }
 
   if (req.files && req.files.length) {
     await Promise.all(product.images.map((i) => i.public_id && deleteFromCloudinary(i.public_id)));

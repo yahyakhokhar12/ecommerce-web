@@ -1,8 +1,6 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { Elements } from '@stripe/react-stripe-js';
-import { loadStripe } from '@stripe/stripe-js';
 import toast from 'react-hot-toast';
 import { selectCartItems, selectCartTotal, clearCart } from '../../features/cart/cartSlice.js';
 import { useCreateOrderMutation } from '../../api/ordersApi.js';
@@ -11,17 +9,20 @@ import { Label } from '../../components/ui/label.jsx';
 import { Button } from '../../components/ui/button.jsx';
 import { formatPrice } from '../../lib/utils.js';
 
-const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY);
-
 export const Checkout = () => {
   const items = useSelector(selectCartItems);
   const total = useSelector(selectCartTotal);
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const [createOrder] = useCreateOrderMutation();
+  const [createOrder, { isLoading }] = useCreateOrderMutation();
+  const [paymentMethod, setPaymentMethod] = useState('cod');
   const [address, setAddress] = useState({
     fullName: '', phone: '', street: '', city: '', state: '', zipCode: '', country: 'USA',
   });
+
+  useEffect(() => {
+    if (!items.length) navigate('/cart', { replace: true });
+  }, [items.length, navigate]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -29,7 +30,7 @@ export const Checkout = () => {
       const order = await createOrder({
         items: items.map((i) => ({ product: i.product, quantity: i.quantity })),
         shippingAddress: address,
-        paymentMethod: 'stripe',
+        paymentMethod,
       }).unwrap();
       dispatch(clearCart());
       toast.success('Order placed!');
@@ -39,10 +40,7 @@ export const Checkout = () => {
     }
   };
 
-  if (!items.length) {
-    navigate('/cart');
-    return null;
-  }
+  if (!items.length) return null;
 
   return (
     <div className="container py-8 max-w-5xl">
@@ -64,7 +62,32 @@ export const Checkout = () => {
           </div>
           <div className="glass p-6 rounded-2xl">
             <h3 className="font-bold text-lg mb-4">Payment</h3>
-            <p className="text-sm text-muted-foreground">Pay securely with Stripe. Click "Place Order" to continue.</p>
+            <div className="grid gap-3 sm:grid-cols-2">
+              <label className={`cursor-pointer rounded-xl border p-4 transition ${paymentMethod === 'cod' ? 'border-fuchsia-500 bg-fuchsia-500/10' : 'hover:bg-accent'}`}>
+                <input
+                  type="radio"
+                  name="paymentMethod"
+                  value="cod"
+                  checked={paymentMethod === 'cod'}
+                  onChange={(e) => setPaymentMethod(e.target.value)}
+                  className="sr-only"
+                />
+                <span className="font-medium">Cash on delivery</span>
+                <span className="mt-1 block text-sm text-muted-foreground">Pay when your order arrives.</span>
+              </label>
+              <label className={`cursor-pointer rounded-xl border p-4 transition ${paymentMethod === 'stripe' ? 'border-fuchsia-500 bg-fuchsia-500/10' : 'hover:bg-accent'}`}>
+                <input
+                  type="radio"
+                  name="paymentMethod"
+                  value="stripe"
+                  checked={paymentMethod === 'stripe'}
+                  onChange={(e) => setPaymentMethod(e.target.value)}
+                  className="sr-only"
+                />
+                <span className="font-medium">Card</span>
+                <span className="mt-1 block text-sm text-muted-foreground">Creates a pending card order for payment review.</span>
+              </label>
+            </div>
           </div>
         </div>
         <div className="glass p-6 rounded-2xl h-fit space-y-4">
@@ -89,7 +112,9 @@ export const Checkout = () => {
               <span>Total</span><span>{formatPrice(total + (total > 100 ? 0 : 10) + total * 0.08)}</span>
             </div>
           </div>
-          <Button type="submit" variant="gradient" className="w-full" size="lg">Place Order</Button>
+          <Button type="submit" variant="gradient" className="w-full" size="lg" disabled={isLoading}>
+            {isLoading ? 'Placing Order...' : 'Place Order'}
+          </Button>
         </div>
       </form>
     </div>

@@ -20,9 +20,21 @@ const userSchema = new mongoose.Schema(
     },
     password: {
       type: String,
-      required: [true, 'Password is required'],
+      required: function () {
+        return this.authProvider === 'local';
+      },
       minlength: 8,
       select: false,
+    },
+    authProvider: {
+      type: String,
+      enum: ['local', 'google', 'facebook'],
+      default: 'local',
+      index: true,
+    },
+    socialIds: {
+      google: String,
+      facebook: String,
     },
     role: {
       type: String,
@@ -31,9 +43,15 @@ const userSchema = new mongoose.Schema(
     },
     avatar: {
       public_id: String,
-      url: { type: String, default: '' },
+      url: {
+        type: String,
+        default: '',
+      },
     },
-    phone: { type: String, trim: true },
+    phone: {
+      type: String,
+      trim: true,
+    },
     address: {
       street: String,
       city: String,
@@ -41,14 +59,27 @@ const userSchema = new mongoose.Schema(
       zipCode: String,
       country: String,
     },
-    isVerified: { type: Boolean, default: false },
-    refreshToken: { type: String, select: false },
+    isVerified: {
+      type: Boolean,
+      default: false,
+    },
+    refreshToken: {
+      type: String,
+      select: false,
+    },
     passwordResetToken: String,
     passwordResetExpires: Date,
     lastLogin: Date,
-    active: { type: Boolean, default: true },
+    active: {
+      type: Boolean,
+      default: true,
+    },
   },
-  { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } }
+  {
+    timestamps: true,
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true },
+  }
 );
 
 userSchema.index({ createdAt: -1 });
@@ -61,6 +92,7 @@ userSchema.virtual('orders', {
 
 userSchema.pre('save', async function (next) {
   if (!this.isModified('password')) return next();
+
   this.password = await bcrypt.hash(this.password, 12);
   next();
 });
@@ -71,9 +103,18 @@ userSchema.methods.comparePassword = async function (candidatePassword) {
 
 userSchema.methods.createPasswordResetToken = function () {
   const resetToken = crypto.randomBytes(32).toString('hex');
-  this.passwordResetToken = crypto.createHash('sha256').update(resetToken).digest('hex');
-  this.passwordResetExpires = Date.now() + 10 * 60 * 1000; // 10 mins
+
+  this.passwordResetToken = crypto
+    .createHash('sha256')
+    .update(resetToken)
+    .digest('hex');
+
+  this.passwordResetExpires = Date.now() + 10 * 60 * 1000;
+
   return resetToken;
 };
 
-export default mongoose.model('User', userSchema);
+// Fix OverwriteModelError
+const User = mongoose.models.User || mongoose.model('User', userSchema);
+
+export default User;

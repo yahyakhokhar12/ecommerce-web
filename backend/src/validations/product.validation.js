@@ -8,11 +8,13 @@ export const createProductSchema = z.object({
     category: z.string().min(1, 'Category required'),
     brand: z.string().min(1),
     sku: z.string().optional(),
-    price: z.number().positive(),
-    discount: z.number().min(0).max(100).optional(),
-    stock: z.number().int().min(0),
+    price: z.coerce.number().positive(),
+    discount: z.coerce.number().min(0).max(100).optional(),
+    stock: z.coerce.number().int().min(0),
     tags: z.array(z.string()).optional(),
     features: z.array(z.string()).optional(),
-    isFeatured: z.boolean().optional(),
+    isFeatured: z
+      .preprocess((value) => value === true || value === 'true', z.boolean())
+      .optional(),
   }),
 });

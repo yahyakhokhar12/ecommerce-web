@@ -4,23 +4,23 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 240 10% 3.9%;
-    --card: 0 0% 100%;
-    --card-foreground: 240 10% 3.9%;
-    --primary: 240 5.9% 10%;
-    --primary-foreground: 0 0% 98%;
-    --secondary: 240 4.8% 95.9%;
-    --secondary-foreground: 240 5.9% 10%;
-    --muted: 240 4.8% 95.9%;
-    --muted-foreground: 240 3.8% 46.1%;
-    --accent: 240 4.8% 95.9%;
-    --accent-foreground: 240 5.9% 10%;
+    --background: 225 35% 7%;
+    --foreground: 210 40% 98%;
+    --card: 224 30% 11%;
+    --card-foreground: 210 40% 98%;
+    --primary: 190 95% 55%;
+    --primary-foreground: 224 35% 7%;
+    --secondary: 226 25% 16%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 226 22% 17%;
+    --muted-foreground: 218 16% 68%;
+    --accent: 226 25% 16%;
+    --accent-foreground: 210 40% 98%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
-    --border: 240 5.9% 90%;
-    --input: 240 5.9% 90%;
-    --ring: 240 5.9% 10%;
+    --border: 220 22% 22%;
+    --input: 220 22% 22%;
+    --ring: 190 95% 55%;
     --radius: 0.75rem;
   }
   .dark {
@@ -46,18 +46,29 @@
   body {
     @apply bg-background text-foreground antialiased;
     font-feature-settings: 'rlig' 1, 'calt' 1;
+    background:
+      radial-gradient(circle at 12% 8%, rgba(20, 184, 166, 0.14), transparent 28rem),
+      radial-gradient(circle at 85% 4%, rgba(217, 70, 239, 0.16), transparent 24rem),
+      linear-gradient(135deg, #070b14 0%, #0d1220 48%, #070a12 100%);
+    min-height: 100vh;
   }
 }
 
 @layer utilities {
   .glass {
-    @apply bg-white/70 backdrop-blur-xl border border-white/20 dark:bg-black/40 dark:border-white/10;
+    @apply border border-white/10 bg-white/[0.07] backdrop-blur-xl shadow-xl shadow-black/20;
   }
   .gradient-text {
-    @apply bg-gradient-to-r from-violet-600 via-fuchsia-500 to-pink-500 bg-clip-text text-transparent;
+    @apply bg-gradient-to-r from-teal-200 via-violet-200 to-fuchsia-300 bg-clip-text text-transparent;
   }
   .gradient-bg {
-    @apply bg-gradient-to-br from-violet-600 via-fuchsia-500 to-pink-500;
+    @apply bg-gradient-to-br from-teal-400 via-violet-500 to-fuchsia-500;
+  }
+  .premium-panel {
+    @apply border border-white/10 bg-[#101827]/80 shadow-2xl shadow-black/30 backdrop-blur-xl;
+  }
+  .section-shell {
+    @apply relative overflow-hidden border-y border-white/10 bg-white/[0.03];
   }
   .shimmer {
     background: linear-gradient(90deg, hsl(var(--muted)) 0%, hsl(var(--accent)) 50%, hsl(var(--muted)) 100%);

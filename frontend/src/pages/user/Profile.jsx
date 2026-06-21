@@ -43,6 +43,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '../../components/ui/dialog.jsx';
+import { apiUrl } from '../../lib/api.js';
 import { useGetMyOrdersQuery } from '../../api/apiSlice.js';
 import { formatDate } from '../../lib/utils.js';
 
@@ -153,7 +154,7 @@ export const Profile = () => {
       const formData = new FormData();
       formData.append('avatar', avatarFile);
       const res = await axios.put(
-        `${import.meta.env.VITE_API_URL}/users/profile`,
+        apiUrl('/users/profile'),
         formData,
         {
           headers: {
@@ -198,7 +199,7 @@ export const Profile = () => {
         },
       };
       const res = await axios.put(
-        `${import.meta.env.VITE_API_URL}/users/profile`,
+        apiUrl('/users/profile'),
         payload,
         {
           headers: { Authorization: `Bearer ${accessToken}` },
@@ -221,7 +222,7 @@ export const Profile = () => {
   const onSubmitPassword = async (data) => {
     try {
       await axios.put(
-        `${import.meta.env.VITE_API_URL}/users/update-password`,
+        apiUrl('/users/update-password'),
         { currentPassword: data.currentPassword, newPassword: data.newPassword },
         {
           headers: { Authorization: `Bearer ${accessToken}` },

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Trash2, CheckCircle, XCircle, Eye, EyeOff } from 'lucide-react';
 import axios from 'axios';
-import AdminLayout from '../../components/admin/AdminLayout';
+import { API_BASE_URL } from '../../lib/api.js';
 
 const AdminReviews = () => {
   const [reviews, setReviews] = useState([]);
@@ -9,7 +9,7 @@ const AdminReviews = () => {
   const [filterStatus, setFilterStatus] = useState('all');
   const [page, setPage] = useState(1);
 
-  const API_BASE = 'http://localhost:5000/api';
+  const API_BASE = API_BASE_URL;
 
   useEffect(() => {
     fetchReviews();
@@ -108,7 +108,7 @@ const AdminReviews = () => {
   };
 
   return (
-    <AdminLayout>
+    <>
       <div className="space-y-6">
         <div>
           <h1 className="text-3xl font-bold text-slate-900 dark:text-white">
@@ -243,7 +243,7 @@ const AdminReviews = () => {
           </div>
         )}
       </div>
-    </AdminLayout>
+    </>
   );
 };
 

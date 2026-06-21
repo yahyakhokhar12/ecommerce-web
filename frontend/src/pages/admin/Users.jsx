@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Trash2, Edit, Lock, Unlock, Filter, Search, Plus } from 'lucide-react';
 import axios from 'axios';
-import AdminLayout from '../../components/admin/AdminLayout';
+import { API_BASE_URL } from '../../lib/api.js';
 
 const AdminUsers = () => {
   const [users, setUsers] = useState([]);
@@ -15,7 +15,7 @@ const AdminUsers = () => {
   const [showModal, setShowModal] = useState(false);
   const [modalMode, setModalMode] = useState('edit'); // 'edit' or 'delete'
 
-  const API_BASE = 'http://localhost:5000/api';
+  const API_BASE = API_BASE_URL;
 
   useEffect(() => {
     fetchUsers();
@@ -140,7 +140,7 @@ const AdminUsers = () => {
   };
 
   return (
-    <AdminLayout>
+    <>
       <div className="space-y-6">
         {/* Header */}
         <div className="flex justify-between items-center">
@@ -340,7 +340,7 @@ const AdminUsers = () => {
           </div>
         </div>
       )}
-    </AdminLayout>
+    </>
   );
 };
 

@@ -1,13 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { Trash2, Edit, Plus, Search } from 'lucide-react';
+import { Trash2, Edit, Plus, Sparkles } from 'lucide-react';
 import axios from 'axios';
-import AdminLayout from '../../components/admin/AdminLayout';
+import { apiUrl } from '../../lib/api.js';
 
 const AdminCategories = () => {
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [editingId, setEditingId] = useState(null);
+  const [seeding, setSeeding] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [status, setStatus] = useState({ type: '', message: '' });
   const [formData, setFormData] = useState({
     name: '',
     slug: '',
@@ -15,7 +18,9 @@ const AdminCategories = () => {
     isActive: true,
   });
 
-  const API_BASE = 'http://localhost:5000/api';
+  const authHeaders = () => ({
+    Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+  });
 
   useEffect(() => {
     fetchCategories();
@@ -24,14 +29,16 @@ const AdminCategories = () => {
   const fetchCategories = async () => {
     try {
       setLoading(true);
-      const response = await axios.get(`${API_BASE}/admin/categories`, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
-        },
+      const response = await axios.get(apiUrl('/admin/categories?limit=100&sort=name'), {
+        headers: authHeaders(),
       });
-      setCategories(response.data.data.categories);
+      setCategories(response.data.data?.categories || response.data.data || []);
     } catch (error) {
       console.error('Error fetching categories:', error);
+      setStatus({
+        type: 'error',
+        message: error.response?.data?.message || 'Could not load categories. Check backend server and admin login.',
+      });
     } finally {
       setLoading(false);
     }
@@ -41,29 +48,44 @@ const AdminCategories = () => {
     e.preventDefault();
 
     try {
+      setSaving(true);
+      setStatus({ type: '', message: '' });
+      const payload = {
+        ...formData,
+        slug: formData.slug.trim(),
+        name: formData.name.trim(),
+        description: formData.description.trim(),
+      };
+
       if (editingId) {
         await axios.put(
-          `${API_BASE}/admin/categories/${editingId}`,
-          formData,
+          apiUrl(`/admin/categories/${editingId}`),
+          payload,
           {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
-            },
+            headers: authHeaders(),
           }
         );
       } else {
-        await axios.post(`${API_BASE}/admin/categories`, formData, {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
-          },
+        await axios.post(apiUrl('/admin/categories'), payload, {
+          headers: authHeaders(),
         });
       }
       setShowModal(false);
       setFormData({ name: '', slug: '', description: '', isActive: true });
       setEditingId(null);
-      fetchCategories();
+      setStatus({
+        type: 'success',
+        message: editingId ? 'Category updated successfully.' : 'Category added successfully.',
+      });
+      await fetchCategories();
     } catch (error) {
       console.error('Error saving category:', error);
+      setStatus({
+        type: 'error',
+        message: error.response?.data?.message || 'Could not save category.',
+      });
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -82,14 +104,36 @@ const AdminCategories = () => {
     if (!window.confirm('Are you sure?')) return;
 
     try {
-      await axios.delete(`${API_BASE}/admin/categories/${id}`, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
-        },
+      await axios.delete(apiUrl(`/admin/categories/${id}`), {
+        headers: authHeaders(),
       });
-      fetchCategories();
+      setStatus({ type: 'success', message: 'Category deleted successfully.' });
+      await fetchCategories();
     } catch (error) {
       console.error('Error deleting category:', error);
+      setStatus({
+        type: 'error',
+        message: error.response?.data?.message || 'Could not delete category.',
+      });
+    }
+  };
+
+  const handleSeedDefaults = async () => {
+    try {
+      setSeeding(true);
+      await axios.post(apiUrl('/admin/categories/seed-defaults'), {}, {
+        headers: authHeaders(),
+      });
+      setStatus({ type: 'success', message: 'Default categories added. Existing categories were kept.' });
+      await fetchCategories();
+    } catch (error) {
+      console.error('Error adding default categories:', error);
+      setStatus({
+        type: 'error',
+        message: error.response?.data?.message || 'Could not add default categories. Make sure you are logged in as admin.',
+      });
+    } finally {
+      setSeeding(false);
     }
   };
 
@@ -100,9 +144,9 @@ const AdminCategories = () => {
   };
 
   return (
-    <AdminLayout>
+    <>
       <div className="space-y-6">
-        <div className="flex justify-between items-center">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div>
             <h1 className="text-3xl font-bold text-slate-900 dark:text-white">
               Categories Management
@@ -111,32 +155,60 @@ const AdminCategories = () => {
               Total Categories: {categories.length}
             </p>
           </div>
-          <button
-            onClick={handleOpenNew}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2"
-          >
-            <Plus size={20} />
-            Add Category
-          </button>
+          <div className="flex flex-col gap-3 sm:flex-row">
+            <button
+              type="button"
+              onClick={handleSeedDefaults}
+              disabled={seeding}
+              className="inline-flex items-center justify-center gap-2 rounded-xl border border-cyan-400/30 bg-cyan-500/10 px-4 py-2 font-semibold text-cyan-100 shadow-lg shadow-cyan-950/20 transition hover:border-cyan-300/60 hover:bg-cyan-500/20 disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              <Sparkles size={18} />
+              {seeding ? 'Adding...' : 'Add Default Categories'}
+            </button>
+            <button
+              type="button"
+              onClick={handleOpenNew}
+              className="inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 py-2 font-semibold text-white shadow-lg shadow-blue-950/30 transition hover:bg-blue-500"
+            >
+              <Plus size={20} />
+              Add Category
+            </button>
+          </div>
         </div>
+
+        {status.message && (
+          <div
+            className={`rounded-2xl border px-4 py-3 text-sm ${
+              status.type === 'error'
+                ? 'border-red-400/30 bg-red-500/10 text-red-200'
+                : 'border-emerald-400/30 bg-emerald-500/10 text-emerald-200'
+            }`}
+          >
+            {status.message}
+          </div>
+        )}
 
         {/* Categories Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {loading ? (
-            <div>Loading...</div>
+            <div className="rounded-xl border border-white/10 bg-slate-900/80 p-5 text-slate-300">
+              Loading categories...
+            </div>
           ) : categories.length === 0 ? (
-            <div>No categories found</div>
+            <div className="col-span-full rounded-2xl border border-dashed border-cyan-400/30 bg-slate-950/70 p-8 text-center text-slate-300">
+              No categories found. Use Add Default Categories to create the main store categories.
+            </div>
           ) : (
             categories.map((category) => (
               <div
                 key={category._id}
-                className="bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 p-4"
+                className="rounded-2xl border border-white/10 bg-slate-950/75 p-5 shadow-xl shadow-black/20"
               >
-                <h3 className="font-bold text-lg mb-2">{category.name}</h3>
-                <p className="text-slate-600 dark:text-slate-400 text-sm mb-4">
+                <h3 className="mb-2 text-lg font-bold text-white">{category.name}</h3>
+                <p className="mb-4 min-h-[40px] text-sm text-slate-400">
                   {category.description}
                 </p>
-                <p className="text-xs text-slate-500 mb-4">Slug: {category.slug}</p>
+                <p className="mb-4 text-xs text-slate-500">Slug: {category.slug}</p>
                 <span
                   className={`inline-block px-3 py-1 rounded-full text-xs font-semibold mb-4 ${
                     category.isActive
@@ -149,14 +221,14 @@ const AdminCategories = () => {
                 <div className="flex gap-2">
                   <button
                     onClick={() => handleEdit(category)}
-                    className="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded flex items-center justify-center gap-2 text-sm"
+                    className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-blue-600 px-3 py-2 text-sm font-semibold text-white transition hover:bg-blue-500"
                   >
                     <Edit size={16} />
                     Edit
                   </button>
                   <button
                     onClick={() => handleDelete(category._id)}
-                    className="flex-1 bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded flex items-center justify-center gap-2 text-sm"
+                    className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-red-600 px-3 py-2 text-sm font-semibold text-white transition hover:bg-red-500"
                   >
                     <Trash2 size={16} />
                     Delete
@@ -236,15 +308,16 @@ const AdminCategories = () => {
                 <button
                   type="submit"
                   className="flex-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg"
+                  disabled={saving}
                 >
-                  Save
+                  {saving ? 'Saving...' : 'Save'}
                 </button>
               </div>
             </form>
           </div>
         </div>
       )}
-    </AdminLayout>
+    </>
   );
 };
 

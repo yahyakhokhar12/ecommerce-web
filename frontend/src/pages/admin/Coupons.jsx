@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Trash2, Edit, Plus, Copy } from 'lucide-react';
 import axios from 'axios';
-import AdminLayout from '../../components/admin/AdminLayout';
+import { API_BASE_URL } from '../../lib/api.js';
 
 const AdminCoupons = () => {
   const [coupons, setCoupons] = useState([]);
@@ -21,7 +21,7 @@ const AdminCoupons = () => {
     isActive: true,
   });
 
-  const API_BASE = 'http://localhost:5000/api';
+  const API_BASE = API_BASE_URL;
 
   useEffect(() => {
     fetchCoupons();
@@ -128,7 +128,7 @@ const AdminCoupons = () => {
   };
 
   return (
-    <AdminLayout>
+    <>
       <div className="space-y-6">
         <div className="flex justify-between items-center">
           <div>
@@ -404,7 +404,7 @@ const AdminCoupons = () => {
           </div>
         </div>
       )}
-    </AdminLayout>
+    </>
   );
 };
 

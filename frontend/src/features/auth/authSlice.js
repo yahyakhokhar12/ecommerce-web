@@ -1,7 +1,17 @@
 import { createSlice } from '@reduxjs/toolkit';
 
+const readJson = (key) => {
+  try {
+    const value = localStorage.getItem(key);
+    return value ? JSON.parse(value) : null;
+  } catch (_error) {
+    localStorage.removeItem(key);
+    return null;
+  }
+};
+
 const initialState = {
-  user: JSON.parse(localStorage.getItem('user')) || null,
+  user: readJson('user'),
   accessToken: localStorage.getItem('accessToken') || null,
   isAuthenticated: !!localStorage.getItem('accessToken'),
 };

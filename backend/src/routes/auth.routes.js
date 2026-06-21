@@ -7,6 +7,10 @@ import { registerSchema, loginSchema, forgotPasswordSchema, resetPasswordSchema 
 const router = Router();
 router.post('/register', validate(registerSchema), auth.register);
 router.post('/login', validate(loginSchema), auth.login);
+router.get('/google', auth.startGoogleOAuth);
+router.get('/google/callback', auth.googleCallback);
+router.get('/facebook', auth.startFacebookOAuth);
+router.get('/facebook/callback', auth.facebookCallback);
 router.post('/refresh-token', auth.refreshToken);
 router.post('/forgot-password', validate(forgotPasswordSchema), auth.forgotPassword);
 router.put('/reset-password/:token', validate(resetPasswordSchema), auth.resetPassword);

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Download, Calendar, TrendingUp } from 'lucide-react';
 import axios from 'axios';
-import AdminLayout from '../../components/admin/AdminLayout';
+import { API_BASE_URL } from '../../lib/api.js';
 
 const AdminReports = () => {
   const [reportType, setReportType] = useState('sales');
@@ -12,7 +12,7 @@ const AdminReports = () => {
   const [reportData, setReportData] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  const API_BASE = 'http://localhost:5000/api';
+  const API_BASE = API_BASE_URL;
 
   const reportTypes = [
     { value: 'sales', label: 'Sales Report', icon: '📊' },
@@ -68,7 +68,7 @@ const AdminReports = () => {
   };
 
   return (
-    <AdminLayout>
+    <>
       <div className="space-y-6">
         <div>
           <h1 className="text-3xl font-bold text-slate-900 dark:text-white">
@@ -371,7 +371,7 @@ const AdminReports = () => {
           </div>
         )}
       </div>
-    </AdminLayout>
+    </>
   );
 };
 

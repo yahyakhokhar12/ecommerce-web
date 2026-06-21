@@ -11,6 +11,7 @@ import { Input } from '../components/ui/input.jsx';
 import { Label } from '../components/ui/label.jsx';
 import { Button } from '../components/ui/button.jsx';
 import { Logo } from '../components/common/Logo.jsx';
+import { apiUrl } from '../lib/api.js';
 
 const passwordSchema = z
   .object({
@@ -95,7 +96,7 @@ export const ResetPassword = () => {
     setIsSubmitting(true);
     try {
       await axios.put(
-        `${import.meta.env.VITE_API_URL}/auth/reset-password/${token}`,
+        apiUrl(`/auth/reset-password/${token}`),
         { password: data.password }
       );
       setIsSuccess(true);

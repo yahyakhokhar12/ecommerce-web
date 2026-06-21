@@ -11,6 +11,7 @@ import { Input } from '../components/ui/input.jsx';
 import { Label } from '../components/ui/label.jsx';
 import { Button } from '../components/ui/button.jsx';
 import { Logo } from '../components/common/Logo.jsx';
+import { apiUrl } from '../lib/api.js';
 
 const schema = z.object({
   email: z.string().email('Please enter a valid email address'),
@@ -31,7 +32,7 @@ export const ForgotPassword = () => {
     setIsSubmitting(true);
     try {
       await axios.post(
-        `${import.meta.env.VITE_API_URL}/auth/forgot-password`,
+        apiUrl('/auth/forgot-password'),
         { email: data.email }
       );
       setSubmittedEmail(data.email);

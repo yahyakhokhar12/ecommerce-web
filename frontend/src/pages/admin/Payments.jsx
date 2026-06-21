@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { RefreshCw, Download, Filter, Search } from 'lucide-react';
 import axios from 'axios';
-import AdminLayout from '../../components/admin/AdminLayout';
+import { API_BASE_URL } from '../../lib/api.js';
 
 const AdminPayments = () => {
   const [payments, setPayments] = useState([]);
@@ -14,7 +14,7 @@ const AdminPayments = () => {
   const [refundAmount, setRefundAmount] = useState('');
   const [refundReason, setRefundReason] = useState('');
 
-  const API_BASE = 'http://localhost:5000/api';
+  const API_BASE = API_BASE_URL;
 
   useEffect(() => {
     fetchPayments();
@@ -100,7 +100,7 @@ const AdminPayments = () => {
   };
 
   return (
-    <AdminLayout>
+    <>
       <div className="space-y-6">
         <div>
           <h1 className="text-3xl font-bold text-slate-900 dark:text-white">
@@ -289,7 +289,7 @@ const AdminPayments = () => {
           </div>
         </div>
       )}
-    </AdminLayout>
+    </>
   );
 };
 

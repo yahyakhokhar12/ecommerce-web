@@ -5,6 +5,7 @@ import { ApiResponse } from '../utils/apiResponse.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
 import { ApiFeatures } from '../utils/apiFeatures.js';
 import { logger } from '../utils/logger.js';
+import { seedDefaultCategories } from '../utils/defaultCategories.js';
 
 /**
  * Get all categories with pagination
@@ -50,16 +51,17 @@ export const getCategoryById = asyncHandler(async (req, res) => {
  */
 export const createCategory = asyncHandler(async (req, res) => {
   const { name, slug, description, image, parent, isActive } = req.body;
+  const finalSlug = slug || name.toLowerCase().replace(/\s+/g, '-');
 
   // Check if category already exists
-  const existingCategory = await Category.findOne({ slug });
+  const existingCategory = await Category.findOne({ slug: finalSlug });
   if (existingCategory) {
     throw new ApiError(400, 'Category with this slug already exists');
   }
 
   const category = new Category({
     name,
-    slug: slug || name.toLowerCase().replace(/\s+/g, '-'),
+    slug: finalSlug,
     description,
     image,
     parent: parent || null,
@@ -71,6 +73,19 @@ export const createCategory = asyncHandler(async (req, res) => {
   logger.info(`Category ${name} created by admin ${req.user._id}`);
 
   res.status(201).json(new ApiResponse(201, category, 'Category created successfully'));
+});
+
+/**
+ * Seed default store categories
+ */
+export const seedCategories = asyncHandler(async (req, res) => {
+  const summary = await seedDefaultCategories();
+
+  logger.info(`Default categories seeded by admin ${req.user._id}`);
+
+  res.status(201).json(
+    new ApiResponse(201, summary, 'Default categories added successfully')
+  );
 });
 
 /**

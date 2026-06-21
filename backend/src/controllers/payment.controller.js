@@ -183,3 +183,27 @@ export const refundPayment = asyncHandler(async (req, res) => {
 
   res.status(200).json(new ApiResponse(200, payment, 'Payment refunded successfully'));
 });
+
+// Admin: Search payments by transaction ID
+export const searchPayments = asyncHandler(async (req, res) => {
+  const { q } = req.query;
+
+  if (!q) {
+    throw new ApiError(400, 'Search query is required');
+  }
+
+  const payments = await Payment.find({
+    $or: [
+      { stripePaymentIntentId: { $regex: q, $options: 'i' } },
+      { paypalTransactionId: { $regex: q, $options: 'i' } },
+      { razorpayPaymentId: { $regex: q, $options: 'i' } },
+    ],
+  })
+    .populate('user', 'name email')
+    .populate('order', 'orderNumber')
+    .limit(50);
+
+  res.status(200).json(
+    new ApiResponse(200, payments, `Found ${payments.length} payments`)
+  );
+});

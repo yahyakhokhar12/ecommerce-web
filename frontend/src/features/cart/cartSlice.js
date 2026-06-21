@@ -1,4 +1,5 @@
 import { createSlice, createSelector } from '@reduxjs/toolkit';
+import { getProductImage } from '../../lib/productImage.js';
 
 const STORAGE_KEY = 'luxecart_cart';
 const WISHLIST_KEY = 'luxecart_wishlist';
@@ -60,7 +61,7 @@ const cartSlice = createSlice({
           title: product.title,
           price: itemPrice,
           originalPrice: product.price,
-          image: product.images?.[0]?.url || product.image,
+          image: getProductImage(product),
           stock: product.stock,
           brand: product.brand,
           quantity: Math.min(quantity, product.stock),

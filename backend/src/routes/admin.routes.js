@@ -35,6 +35,7 @@ router.get('/users-stats', adminUsers.getUserStats);
 
 // Category Management
 router.get('/categories', adminCategories.getAllCategories);
+router.post('/categories/seed-defaults', adminCategories.seedCategories);
 router.get('/categories/:id', adminCategories.getCategoryById);
 router.post('/categories', adminCategories.createCategory);
 router.put('/categories/:id', adminCategories.updateCategory);
