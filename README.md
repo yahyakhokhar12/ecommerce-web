@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 # Ecommerce Web
 
 Production-ready MERN e-commerce application with React, Vite, Redux Toolkit, Express, MongoDB, Stripe, Cloudinary, email templates, admin analytics, wishlist, reviews, coupons, Docker, linting, and tests.
@@ -213,4 +213,4 @@ The `vercel.json` at repo root builds the React app from `frontend/` and exposes
 **Scripts**
 - Backend: `npm run dev` (nodemon), `npm start`
 - Frontend: `npm start`, `npm run build`
->>>>>>> a0095055bba0d4c777d62a743cf779805fd20563
+
